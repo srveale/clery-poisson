@@ -23,12 +23,12 @@ to_drop = c('Unnamed..0', 'Murder.Non.negligent.manslaughter', 'Negligent.mansla
 
 crimes = crimes[ , !(names(crimes) %in% to_drop)]
 
-crimes$crime_rate = crimes$sum_crimes / crimes$Institution.Size * 1000
+crimes$crime_rate = crimes$sum_crimes / crimes$Institution.Size * 1000 + 0.01
 
 crimes
 ```
 
 ```{r}
-
+fit1 = glm(crime_rate ~ Institution.Size + region, family=poisson, data=crimes)
 ```
 
