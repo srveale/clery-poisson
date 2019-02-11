@@ -19,16 +19,66 @@ crimes$sum_crimes = crimes$Murder.Non.negligent.manslaughter + crimes$Negligent.
   crimes$Incest + crimes$Statutory.rape + crimes$Robbery + crimes$Aggravated.assault + crimes$Burglary +
   crimes$Motor.vehicle.theft + crimes$Arson
 
-to_drop = c('Unnamed..0', 'Murder.Non.negligent.manslaughter', 'Negligent.manslaughter', 'Sex.offenses...Forcible', 'Rape', 'Fondling', 'Sex.offenses...Non.forcible', 'Incest', 'Statutory.rape', 'Robbery', 'Aggravated.assault', 'Burglary', 'Motor.vehicle.theft', 'Arson', 'Campus.Name', 'UNITID', 'Postsecondary.School.State', 'Postsecondary.School.ZIP', 'OPEID', 'Unitid', 'Campus.ID')
+to_drop = c('Unnamed..0', 'Murder.Non.negligent.manslaughter', 'Negligent.manslaughter', 'Sex.offenses...Forcible', 'Rape', 'Fondling', 'Sex.offenses...Non.forcible', 'Incest', 'Statutory.rape', 'Robbery', 'Aggravated.assault', 'Burglary', 'Motor.vehicle.theft', 'Arson', 'Campus.Name', 'UNITID', 'Postsecondary.School.State', 'OPEID', 'Unitid', 'Campus.ID')
 
 crimes = crimes[ , !(names(crimes) %in% to_drop)]
 
 crimes$crime_rate = crimes$sum_crimes / crimes$Institution.Size * 1000 + 0.01
 
+crimes <- crimes[crimes$crime_rate != Inf, ]
+crimes <- crimes[crimes$crime_rate > 0.01, ]
+
+crimes <- crimes[complete.cases(crimes), ]
+
+#colnames(crimes)
+#colnames(crimes)[7] <- "TwoOrFour"
+#colnames(crimes)[8] <- "PublicOrPrivate"
+
 crimes
 ```
 
 ```{r}
-fit1 = glm(crime_rate ~ Institution.Size + region, family=poisson, data=crimes)
+incomedata = read.csv('income_data.csv')
+incomedata = data.frame(incomedata$zipcode, incomedata$agi_stub)
+colnames(incomedata) = c('Postsecondary.School.ZIP', 'IncomeCategory')
+incomedata = incomedata[incomedata$Postsecondary.School.ZIP != 0, ]
+incomedata
+crimes$Postsecondary.School.ZIP = as.integer(crimes$Postsecondary.School.ZIP)
+merge(crimes, incomedata, by.x="Postsecondary.School.ZIP", by.y="Postsecondary.School.ZIP")
+```
+
+```{r}
+incomedata
+```
+
+
+```{r}
+boxplot(crimes$crime_rate, log="y")
+
+```
+
+
+```{r}
+fit1 = glm(sum_crimes ~ region + TwoOrFour + PublicOrPrivate, family=poisson, offset = log(Institution.Size), data=crimes)
+
+summary(fit1)
+```
+```{r}
+fit2 = glm(sum_crimes ~ region + TwoOrFour + PublicOrPrivate +
+             region:TwoOrFour + region:PublicOrPrivate + TwoOrFour:PublicOrPrivate,
+           family=poisson, offset = log(Institution.Size), data=crimes)
+
+```
+
+```{r}
+anova(fit1, fit2)
+```
+
+```{r}
+summary(fit2)
+```
+
+```{r}
+plot(predict(fit1))
 ```
 
