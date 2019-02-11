@@ -1,0 +1,27 @@
+---
+title: "Campus Crime Counts"
+output: html_notebook
+---
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(zoo)
+library(ggmap)
+```
+
+```{r}
+crimes = read.csv("~/Downloads/crimes_with_region.csv")
+crimes[is.na(crimes)] <- 0
+
+crimes$sum_crimes = crimes$Murder.Non.negligent.manslaughter + crimes$Negligent.manslaughter +
+  crimes$Sex.offenses...Forcible + crimes$Rape + crimes$Fondling + crimes$Sex.offenses...Non.forcible +
+  crimes$Incest + crimes$Statutory.rape + crimes$Robbery + crimes$Aggravated.assault + crimes$Burglary +
+  crimes$Motor.vehicle.theft + crimes$Arson
+
+crimes
+```
+
+```{r}
+crimes
+```
