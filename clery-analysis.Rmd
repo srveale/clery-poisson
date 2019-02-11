@@ -11,7 +11,7 @@ library(ggmap)
 ```
 
 ```{r}
-crimes = read.csv("~/Downloads/crimes_with_region.csv")
+crimes = read.csv("crimes_with_region.csv")
 crimes[is.na(crimes)] <- 0
 
 crimes$sum_crimes = crimes$Murder.Non.negligent.manslaughter + crimes$Negligent.manslaughter +
@@ -19,9 +19,16 @@ crimes$sum_crimes = crimes$Murder.Non.negligent.manslaughter + crimes$Negligent.
   crimes$Incest + crimes$Statutory.rape + crimes$Robbery + crimes$Aggravated.assault + crimes$Burglary +
   crimes$Motor.vehicle.theft + crimes$Arson
 
+to_drop = c('Unnamed..0', 'Murder.Non.negligent.manslaughter', 'Negligent.manslaughter', 'Sex.offenses...Forcible', 'Rape', 'Fondling', 'Sex.offenses...Non.forcible', 'Incest', 'Statutory.rape', 'Robbery', 'Aggravated.assault', 'Burglary', 'Motor.vehicle.theft', 'Arson', 'Campus.Name', 'UNITID', 'Postsecondary.School.State', 'Postsecondary.School.ZIP', 'OPEID', 'Unitid', 'Campus.ID')
+
+crimes = crimes[ , !(names(crimes) %in% to_drop)]
+
+crimes$crime_rate = crimes$sum_crimes / crimes$Institution.Size * 1000
+
 crimes
 ```
 
 ```{r}
-crimes
+
 ```
+
